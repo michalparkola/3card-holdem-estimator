@@ -148,13 +148,15 @@ _FULL_DECK = [Card(c) for c in _FULL_DECK_RAW]
 
 def deal_cards(deck, number_of_cards = 1):
     """
-    Randomly selects number_of_cards from deck.
+    Randomly selects cards from a deck (without replacement).
     Modifies outer deck by removing dealt cards.
+    Returns a list of Cards of length = number_of_cards
+       in descending order
     """
-    player_hand = random.sample(deck, number_of_cards)
-    for c in player_hand:
+    cards = random.sample(deck, number_of_cards)
+    for c in cards:
         deck.remove(c)
-    return player_hand
+    return sorted(cards, reverse = True)
 
 royal = Hand.fromString('As Ks Qs Js Ts')
 quads = Hand.fromString('As Ah Ad Ac 2c')
@@ -169,75 +171,47 @@ hi = Hand.fromString('As Kh 9s 6d 2c')
 # TODO: generate frequency histogram for different ranks of hands
 # TODO: compare hands within a category
 
-# the functions below take Hand's but would also work for lists of Cards
-def isHighCard(hand):
-    cnt = collections.Counter([c.rank for c in hand])
-    return sorted(cnt.values()) == [1,1,1,1,1]
-
-def isPair(hand):
-    cnt = collections.Counter([c.rank for c in hand])
-    return sorted(cnt.values()) == [1,1,1,2]
-
-def isTwoPair(hand):
-    cnt = collections.Counter([c.rank for c in hand])
-    return sorted(cnt.values()) == [1,2,2]
-
-def isTrips(hand):
-    cnt = collections.Counter([c.rank for c in hand])
-    return sorted(cnt.values()) == [1,1,3]
-
-def isStraight(hand):
-    h = list(hand)
-    return all((h[i].rank == 1 + h[i+1].rank) for i in range(4))
-
-def isFlush(hand):
-    return len(set([c.suit for c in hand])) == 1
-
-def isFullHouse(hand):
-    cnt = collections.Counter([c.rank for c in hand])
-    return sorted(cnt.values()) == [2,3]
-
-def isQuads(hand):
-    cnt = collections.Counter([c.rank for c in hand])
-    return sorted(cnt.values()) == [1,4]
-
-def isStraightFlush(hand):
-    return isStraight(hand) and isFlush(hand)
-
 def rank5(hand):
     rank = 0
-    if isStraightFlush(hand):
+    # group cards by rank
+    cnt = collections.Counter([c.rank for c in hand])
+    # rank frequencies in increasing order
+    rank_count = sorted(cnt.values())
+
+    isFlush = len(set([c.suit for c in hand])) == 1
+    h = list(hand)
+    isStraight = all((h[i].rank == 1 + h[i+1].rank) for i in range(4))
+
+    if isFlush and isStraight:
         print(hand, "is a straight flush")
         rank = 8
-    elif isQuads(hand):
+    elif rank_count == [1,4]:
         print(hand, "is quads")
         rank = 7
-    elif isFullHouse(hand):
+    elif rank_count == [2,3]:
         print(hand, "is a full house")
         rank = 6
-    elif isFlush(hand):
+    elif isFlush:
         print(hand, "is a flush")
         rank = 5
-    elif isStraight(hand):
+    elif isStraight:
         print(hand, "is a straight")
         rank = 4
-    elif isTrips(hand):
+    elif rank_count == [1,1,3]:
         print(hand, "is trips")
         rank = 3
-    elif isTwoPair(hand):
+    elif rank_count == [1,2,2]:
         print(hand, "is two pair")
         rank = 2
-    elif isPair(hand):
+    elif rank_count == [1,1,1,2]:
         print(hand, "is one pair")
         rank = 1
-    elif isHighCard(hand):
+    elif rank_count == [1,1,1,1,1]:
         print(hand, "is a high card hand")
         rank = 0
-    else:
-        rank = -1
     return rank
 
-# Warning: hand can mean an instance of class Hand or a list of Cards
+# Warning: hand can mean an instance of class Hand or just a list of Cards
 # rank5plus2 sends
 def rank5plus2(board, hole_cards):
     """
@@ -262,6 +236,9 @@ def rank5plus3(board, hole_cards):
 # h = deal_cards(d, 2)
 # rank5plus2(b, h)
 
+for i in range(50):
+    rank5(deal_cards(_FULL_DECK.copy(),5))
+
 # rank5(royal)
 # rank5(quads)
 # rank5(full)
@@ -271,4 +248,4 @@ def rank5plus3(board, hole_cards):
 # rank5(hi)
 
 # print(royal > hi)
-print(Hand.fromString('AhAcAsAd3c') > Hand.fromString('AhAsAdAc2c'))
+# print(Hand.fromString('AhAcAsAd3c') > Hand.fromString('AhAsAdAc2c'))
