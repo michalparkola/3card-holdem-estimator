@@ -54,7 +54,7 @@ class Hand:
             # Same hand type --> compare howHigh
             assert(self_type == other_type)
             if self_type in [STRAIGHT_FLUSH, FLUSH, STRAIGHT, HIGH_CARD]:
-                return self < other
+                return self.cards < other.cards
             elif self_type in [QUADS, FULL_HOUSE, TRIPS, TWO_PAIR, PAIR]:
                 if self_howHigh < other_howHigh:
                     return True
@@ -79,7 +79,7 @@ class Hand:
 
         return cls(cards)
 
-_FULL_DECK_RAW = [
+FULL_DECK_RAW = [
     'As', 'Ah', 'Ad', 'Ac',
     'Ks', 'Kh', 'Kd', 'Kc',
     'Qs', 'Qh', 'Qd', 'Qc',
@@ -95,7 +95,7 @@ _FULL_DECK_RAW = [
     '2s', '2h', '2d', '2c'
 ]
 
-_FULL_DECK = [Card(c) for c in _FULL_DECK_RAW]
+FULL_DECK = [Card(c) for c in FULL_DECK_RAW]
 
 STRAIGHT_FLUSH = 8
 QUADS = 7
@@ -107,7 +107,7 @@ TWO_PAIR = 2
 PAIR = 1
 HIGH_CARD = 0
 
-def rank5(hand):
+def rank5(hand, loud = False):
     # group cards by rank
     rank_count_dict = collections.Counter([c.rank for c in hand])
     rank_count_values = sorted(rank_count_dict.values(), reverse = True)
@@ -121,38 +121,38 @@ def rank5(hand):
         handType = STRAIGHT_FLUSH
         howHigh = list(hand)[0].rank # Cards in Hand are in descending order by rank
         kickers = None
-        print(hand, "is a straight flush", Card.rank2name[howHigh], "high")
+        if(loud): print(hand, "is a straight flush", Card.rank2name[howHigh], "high")
 
     elif rank_count_values == [4, 1]:
         handType = QUADS
         howHigh = rank_count_items[0][0]
-        kickers = rank_count_items[1][0]
-        print(hand, "is quad", Card.rank2name[howHigh], "with", kickers, "kicker")
+        kickers = [rank_count_items[1][0]]
+        if(loud): print(hand, "is quad", Card.rank2name[howHigh], "with", kickers, "kicker")
 
     elif rank_count_values == [3, 2]:
         handType = FULL_HOUSE
         howHigh = rank_count_items[0][0], rank_count_items[1][0]
         kickers = None # TODO
-        print(hand, "is a full house", Card.rank2name[howHigh[0]], "full of", Card.rank2name[howHigh[1]])
+        if(loud): print(hand, "is a full house", Card.rank2name[howHigh[0]], "full of", Card.rank2name[howHigh[1]])
  
     elif isFlush:
         handType = FLUSH
         howHigh = hand
         kickers = hand
-        print(hand, "is a flush", howHigh) 
+        if(loud): print(hand, "is a flush", howHigh) 
 
     elif isStraight:
         handType = STRAIGHT
         howHigh = list(hand)[0].rank # Cards in Hand are in descending order by rank
         kickers = hand
-        print(hand, "is a straight", Card.rank2name[howHigh], "high")
+        if(loud): print(hand, "is a straight", Card.rank2name[howHigh], "high")
  
     elif rank_count_values == [3, 1, 1]:
         handType = TRIPS
         howHigh = rank_count_items[0][0]
         kickers = [c for c in hand if c.rank != howHigh]
         assert(len(kickers) == 2)
-        print(hand, "is trips", howHigh, "with", kickers)
+        if(loud): print(hand, "is trips", howHigh, "with", kickers)
  
     elif rank_count_values == [2, 2, 1]:
         handType = TWO_PAIR
@@ -161,25 +161,25 @@ def rank5(hand):
         pair1 = max(a, b)
         pair2 = min(a, b)
         howHigh = pair1, pair2
-        kickers = rank_count_items[2][0]
-        print(hand, "is two pair", Card.rank2name[pair1], "and", Card.rank2name[pair2], "with", kickers, "kicker")
+        kickers = [rank_count_items[2][0]]
+        if(loud): print(hand, "is two pair", Card.rank2name[pair1], "and", Card.rank2name[pair2], "with", kickers, "kicker")
  
     elif rank_count_values == [2, 1, 1, 1]:
         handType = PAIR
         howHigh = rank_count_items[0][0]
         kickers = list(map(lambda x: x[0], rank_count_items[1:]))
-        print(hand, "is one pair", Card.rank2name[howHigh], "with", kickers, "kickers")
+        if(loud): print(hand, "is one pair", Card.rank2name[howHigh], "with", kickers, "kickers")
  
     elif rank_count_values == [1, 1, 1, 1, 1]:
         handType = HIGH_CARD
         howHigh = None
         kickers = hand
-        print(hand, "is a high card hand", hand)
+        if(loud): print(hand, "is a high card hand", hand)
     return handType, howHigh, kickers
 
-def rank5plus2(board, hole_cards):
+def best5plus2(board, hole_cards):
     """
-    Calculates the (integer) rank of the best 5 card combination
+    Finds the best 5 card combination
       taken from 7 Cards (5 board Cards + 2 player Cards)
     
     Expected arguments: lists of Cards
@@ -187,7 +187,12 @@ def rank5plus2(board, hole_cards):
     # list of tuples of Cards
     possible_combinations = itertools.combinations(board + hole_cards, 5)
     possible_hands = [Hand(list(toc)) for toc in possible_combinations]
-    return max(rank5(h) for h in possible_hands)
+    best = possible_hands.pop()
+    while(possible_hands):
+        challenger = possible_hands.pop()
+        if best < challenger:
+            best = challenger
+    return best
 
 def deal_cards(deck, number_of_cards = 1):
     """
@@ -200,43 +205,3 @@ def deal_cards(deck, number_of_cards = 1):
     for c in cards:
         deck.remove(c)
     return sorted(cards, reverse = True)
-
-# TODO: generate frequency histogram for different ranks of hands
-
-# d = _FULL_DECK.copy()
-# b = deal_cards(d, 5)
-# h = deal_cards(d, 2)
-# rank5plus2(b, h)
-
-# for i in range(50):
-#     rank5(deal_cards(_FULL_DECK.copy(),5))
-
-royal = Hand.fromString('As Ks Qs Js Ts')
-quads = Hand.fromString('3s 3h 3d 3c 2c')
-full = Hand.fromString('As Ah Kd Ks Kh')
-flush = Hand.fromString('3s 4s 7s 9s Js')
-trip2sAK = Hand.fromString('As Kh 2d 2s 2c')
-trip2sAQ = Hand.fromString('As Qh 2d 2s 2c')
-str8 = Hand.fromString('Ad Ks Qs Js Ts')
-twop = Hand.fromString('As 2c Ks Ah Kc')
-pearA_962 = Hand.fromString('As Ah 9s 6d 2c')
-pearA_952 = Hand.fromString('As Ah 9s 5d 2c')
-hi = Hand.fromString('As Kh 9s 6d 2c')
-
-# rank5(royal)
-# rank5(quads)
-# rank5(full)
-# rank5(flush)
-# rank5(str8)
-# rank5(trip2sAK)
-# rank5(trip2sAQ)
-# rank5(twop)
-# rank5(pearA)
-# rank5(hi)
-
-print(royal > quads)
-print(trip2sAQ < trip2sAK)
-print(pearA_952 > pearA_962)
-
-# print(royal > hi)
-# print(Hand.fromString('AhAcAsAd3c') > Hand.fromString('AhAsAdAc2c'))
