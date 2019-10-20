@@ -62,8 +62,10 @@ class Hand:
                     return False
                 else:
                     # Same howHigh --> compare kickers
-                    assert(len(self_kickers) == len(other_kickers))
-                    return self_kickers < other_kickers
+                    if self_kickers:
+                        assert(len(self_kickers) == len(other_kickers))
+                        return self_kickers < other_kickers
+                    return False
 
     @classmethod
     def fromString(cls, s):
@@ -132,7 +134,7 @@ def rank5(hand, loud = False):
     elif rank_count_values == [3, 2]:
         handType = FULL_HOUSE
         howHigh = rank_count_items[0][0], rank_count_items[1][0]
-        kickers = None # TODO
+        kickers = None
         if(loud): print(hand, "is a full house", Card.rank2name[howHigh[0]], "full of", Card.rank2name[howHigh[1]])
  
     elif isFlush:

@@ -9,15 +9,26 @@ h1 = deal_cards(d, 2)
 print("Hero has:", h1)
 h2 = deal_cards(d, 2)
 print("Villain has:", h2)
-board = deal_cards(d, 5)
-print("The board is:", board)
 
-b1 = best5plus2(board, h1)
-b2 = best5plus2(board, h2)
+heroWins = 0
+villainWins = 0
+tie = 0
 
-if (b1 > b2): print ("Hero wins with", b1, "vs.", b2)
-elif (b1 < b2): print ("Villain wins with", b2, "vs.", b1)
-else: print("It's a tie!")
+trials = 1000
+
+for i in range(trials):
+    board = deal_cards(d.copy(), 5)
+    # print(board)
+    b1 = best5plus2(board, h1)
+    b2 = best5plus2(board, h2)
+    if (b1 > b2):
+        heroWins += 1
+    elif (b1 < b2):
+        villainWins += 1
+    else:
+        tie += 1
+
+print("Hero wins:", heroWins/trials, "Villain wins:", villainWins/trials, "Ties:", tie/trials)
 
 # for i in range(50):
 #     rank5(deal_cards(FULL_DECK.copy(),5))
