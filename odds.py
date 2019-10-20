@@ -65,7 +65,8 @@ class Hand:
                     if self_kickers:
                         assert(len(self_kickers) == len(other_kickers))
                         return self_kickers < other_kickers
-                    return False
+                    else:
+                        return False
 
     @classmethod
     def fromString(cls, s):
@@ -192,6 +193,26 @@ def best5plus2(board, hole_cards):
     best = possible_hands.pop()
     while(possible_hands):
         challenger = possible_hands.pop()
+        if best < challenger:
+            best = challenger
+    return best
+
+def best5plus3(board, hole_cards):
+    best = Hand(board)
+    # test using 1 card
+    combos = itertools.combinations(hole_cards, 1)
+    combos = list(map(lambda x: list(x), combos))
+    assert(len(combos) == 3)
+    for c in combos:
+        challenger = best5plus2(board, c)
+        if best < challenger:
+            best = challenger
+    # test using 2 cards
+    combos = itertools.combinations(hole_cards, 2)
+    combos = list(map(lambda x: list(x), combos))
+    assert(len(combos) == 3)
+    for c in combos:
+        challenger = best5plus2(board, c)
         if best < challenger:
             best = challenger
     return best

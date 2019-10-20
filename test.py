@@ -1,14 +1,18 @@
 from odds import *
 
-
 # TODO: generate frequency histogram for different ranks of hands
 
-print("Hand:")
 d = FULL_DECK.copy()
-h1 = deal_cards(d, 2)
+h1 = deal_cards(d, 3)
 print("Hero has:", h1)
-h2 = deal_cards(d, 2)
+h2 = deal_cards(d, 3)
 print("Villain has:", h2)
+
+# board = deal_cards(d, 5)
+# print("Board is", board)
+
+# print("Hero best:", best5plus3(board, h1))
+# print("Villain best:", best5plus3(board, h2))
 
 heroWins = 0
 villainWins = 0
@@ -19,8 +23,8 @@ trials = 1000
 for i in range(trials):
     board = deal_cards(d.copy(), 5)
     # print(board)
-    b1 = best5plus2(board, h1)
-    b2 = best5plus2(board, h2)
+    b1 = best5plus3(board, h1)
+    b2 = best5plus3(board, h2)
     if (b1 > b2):
         heroWins += 1
     elif (b1 < b2):
