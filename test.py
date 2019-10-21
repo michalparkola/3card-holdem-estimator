@@ -10,11 +10,12 @@ full = Hand.fromString('As Ah Kd Ks Kh')
 flush = Hand.fromString('3s 4s 7s 9s Js')
 trip2sAK = Hand.fromString('As Kh 2d 2s 2c')
 trip2sAQ = Hand.fromString('As Qh 2d 2s 2c')
-str8 = Hand.fromString('Ad Ks Qs Js Ts')
+str8 = Hand.fromString('9d Ks Qs Js Ts')
 twop = Hand.fromString('As 2c Ks Ah Kc')
 pearA_962 = Hand.fromString('As Ah 9s 6d 2c')
 pearA_952 = Hand.fromString('As Ah 9s 5d 2c')
 hi = Hand.fromString('As Kh 9s 6d 2c')
+wheel = Hand.fromString('As 5h 4s 3d 2c')
 
 rank5(royal)
 rank5(quads)
@@ -26,6 +27,12 @@ rank5(trip2sAQ)
 rank5(twop)
 rank5(pearA_962)
 rank5(hi)
+rank5(wheel, loud=True)
+
+print("wheel < royal", wheel < royal)
+
+# TODO: fix wheel handling
+print("wheel > K-high str8", wheel > str8)
 
 print(royal > quads)
 print(trip2sAQ < trip2sAK)

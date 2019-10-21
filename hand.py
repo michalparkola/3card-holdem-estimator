@@ -37,7 +37,16 @@ class Hand:
         else:
             # Same hand type --> compare howHigh
             assert(self_type == other_type)
-            if self_type in [STRAIGHT_FLUSH, FLUSH, STRAIGHT, HIGH_CARD]:
+            if self_type in [STRAIGHT_FLUSH, STRAIGHT]:
+                # self is a wheel while other is not
+                if (self.cards[0].rank == 14 and self.cards[1].rank == 5) and (other.cards[0].rank != 14 or other.cards[1].rank != 5):
+                    return True
+                # other is a wheel while self is not
+                elif (self.cards[0].rank != 14 or self.cards[1].rank != 5) and (other.cards[0].rank == 14 and other.cards[1].rank == 5):
+                    return False
+                else:
+                    return self.cards < other.cards
+            if self_type in [FLUSH, HIGH_CARD]:
                 return self.cards < other.cards
             elif self_type in [QUADS, FULL_HOUSE, TRIPS, TWO_PAIR, PAIR]:
                 if self_howHigh < other_howHigh:
@@ -76,7 +85,6 @@ TWO_PAIR = 2
 PAIR = 1
 HIGH_CARD = 0
 
-
 def rank5(hand, loud = False):
     # group cards by rank
     rank_count_dict = collections.Counter([c.rank for c in hand])
@@ -84,7 +92,8 @@ def rank5(hand, loud = False):
     rank_count_items = sorted(rank_count_dict.items(), key = lambda x: x[1], reverse = True)
 
     h = list(hand)
-    isStraight = all((h[i].rank == 1 + h[i+1].rank) for i in range(4))
+    isWheel = h[0].rank == 14 and h[1].rank == 5 and h[2].rank == 4 and h[3].rank == 3 and h[4].rank == 2
+    isStraight = all((h[i].rank == 1 + h[i+1].rank) for i in range(4)) or isWheel
     isFlush = len(set([c.suit for c in hand])) == 1
     
     if isFlush and isStraight:
