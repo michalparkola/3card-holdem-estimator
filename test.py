@@ -1,68 +1,36 @@
-from odds import *
+from deck import Card, FULL_DECK, deal_cards
+from hand import Hand, rank5
 
-# TODO: generate frequency histogram for different ranks of hands
+for i in range(50):
+    rank5(deal_cards(FULL_DECK.copy(),5))
 
-d = FULL_DECK.copy()
-h1 = deal_cards(d, 3)
-print("Hero has:", h1)
-h2 = deal_cards(d, 3)
-print("Villain has:", h2)
+royal = Hand.fromString('As Ks Qs Js Ts')
+quads = Hand.fromString('3s 3h 3d 3c 2c')
+full = Hand.fromString('As Ah Kd Ks Kh')
+flush = Hand.fromString('3s 4s 7s 9s Js')
+trip2sAK = Hand.fromString('As Kh 2d 2s 2c')
+trip2sAQ = Hand.fromString('As Qh 2d 2s 2c')
+str8 = Hand.fromString('Ad Ks Qs Js Ts')
+twop = Hand.fromString('As 2c Ks Ah Kc')
+pearA_962 = Hand.fromString('As Ah 9s 6d 2c')
+pearA_952 = Hand.fromString('As Ah 9s 5d 2c')
+hi = Hand.fromString('As Kh 9s 6d 2c')
 
-# board = deal_cards(d, 5)
-# print("Board is", board)
+rank5(royal)
+rank5(quads)
+rank5(full)
+rank5(flush)
+rank5(str8)
+rank5(trip2sAK)
+rank5(trip2sAQ)
+rank5(twop)
+rank5(pearA_962)
+rank5(hi)
 
-# print("Hero best:", best5plus3(board, h1))
-# print("Villain best:", best5plus3(board, h2))
+print(royal > quads)
+print(trip2sAQ < trip2sAK)
+print(pearA_952 > pearA_962)
+print(royal > hi)
+print(Hand.fromString('AhAcAsAd3c') > Hand.fromString('AhAsAdAc2c'))
 
-heroWins = 0
-villainWins = 0
-tie = 0
-
-trials = 1000
-
-for i in range(trials):
-    board = deal_cards(d.copy(), 5)
-    # print(board)
-    b1 = best5plus3(board, h1)
-    b2 = best5plus3(board, h2)
-    if (b1 > b2):
-        heroWins += 1
-    elif (b1 < b2):
-        villainWins += 1
-    else:
-        tie += 1
-
-print("Hero wins:", heroWins/trials, "Villain wins:", villainWins/trials, "Ties:", tie/trials)
-
-# for i in range(50):
-#     rank5(deal_cards(FULL_DECK.copy(),5))
-
-# royal = Hand.fromString('As Ks Qs Js Ts')
-# quads = Hand.fromString('3s 3h 3d 3c 2c')
-# full = Hand.fromString('As Ah Kd Ks Kh')
-# flush = Hand.fromString('3s 4s 7s 9s Js')
-# trip2sAK = Hand.fromString('As Kh 2d 2s 2c')
-# trip2sAQ = Hand.fromString('As Qh 2d 2s 2c')
-# str8 = Hand.fromString('Ad Ks Qs Js Ts')
-# twop = Hand.fromString('As 2c Ks Ah Kc')
-# pearA_962 = Hand.fromString('As Ah 9s 6d 2c')
-# pearA_952 = Hand.fromString('As Ah 9s 5d 2c')
-# hi = Hand.fromString('As Kh 9s 6d 2c')
-
-# rank5(royal)
-# rank5(quads)
-# rank5(full)
-# rank5(flush)
-# rank5(str8)
-# rank5(trip2sAK)
-# rank5(trip2sAQ)
-# rank5(twop)
-# rank5(pearA)
-# rank5(hi)
-
-# print(royal > quads)
-# print(trip2sAQ < trip2sAK)
-# print(pearA_952 > pearA_962)
-
-# print(royal > hi)
-# print(Hand.fromString('AhAcAsAd3c') > Hand.fromString('AhAsAdAc2c'))
+# idea: generate frequency histogram for different ranks of hands
